@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PaperMint</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+
+    <style>
+    :root {
+        --bg: #000;
+        --glass: rgba(32, 33, 36, 0.6);
+        --border: rgba(255,255,255,0.1);
+        --text: #e8eaed;
+        --sub: #eef2f6;
+        --accent: #8ab4f8;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Google Sans', Arial;
+        background: radial-gradient(circle at top, #111, #000);
+        color: var(--text);
+    }
+
+    /* NAVBAR */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 40px;
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(10px);
+        background: rgba(0,0,0,0.4);
+        position: sticky;
+        top: 0;
+    }
+
+    .nav-links a {
+        margin-left: 20px;
+        text-decoration: none;
+        color: var(--text);
+        transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: var(--accent);
+    }
+
+    /* MAIN */
+    .container {
+        max-width: 900px;
+        margin: 12vh auto;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 3em;
+        font-weight: 300;
+    }
+
+    .tagline {
+        color: var(--sub);
+        margin-bottom: 40px;
+    }
+
+    /* INPUT BOX */
+    .main-input {
+        background: var(--glass);
+        border-radius: 25px;
+        padding: 20px;
+        border: 1px solid var(--border);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    textarea {
+        width: 100%;
+        height: 150px;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: 1.1em;
+        outline: none;
+        resize: none;
+    }
+
+    /* OPTIONS */
+    .options {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .left-options {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    select {
+        background: var(--glass);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    label {
+        color: var(--sub);
+        font-size: 0.9em;
+    }
+
+    /* BUTTON */
+    button {
+        background: var(--accent);
+        color: black;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+    }
+
+    /* CHECKBOX */
+    input[type="checkbox"] {
+        accent-color: var(--accent);
+    }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div><strong>PaperMint</strong></div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/app">Get Started</a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="container">
+
+        <h1>PaperMint</h1>
+        <p class="tagline">Ask the AI PDF Maker to create your document.</p>
+
+        <form method="POST" action="/generate-ui">
+
+            <div class="main-input">
+                <textarea name="content" placeholder="Generate a resume for a Python developer, focusing on FastAPI." required></textarea>
+            </div>
+
+            <div class="options">
+
+                <div class="left-options">
+
+                    <!-- TEMPLATE -->
+                    <div>
+                        <label>Template</label><br>
+                        <select name="template_type">
+                            {% for t in templates %}
+                                <option value="{{ t }}">{{ t | capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- MODEL -->
+                    <!-- <div>
+                        <label>LLM Model</label><br>
+                        <select name="model">
+                            {% for m in models %}
+                                <option value="{{ m }}">{{ m | upper }}</option>
+                            {% endfor %}
+                        </select>
+                    </div> -->
+
+                </div>
+
+                <button type="submit">Generate PDF</button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+</html>
