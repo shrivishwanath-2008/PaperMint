@@ -1,7 +1,6 @@
 import os
 import json
 import re
-
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -18,53 +17,51 @@ def extract_tagged_field(text: str, tag: str) -> str:
     return match.group(1).strip() if match else ""
 
 
-def normalize_generated_content(content: str) -> str:
-    if not content:
-        return ""
-
-    normalized = content.strip()
-    normalized = normalized.replace("**", "")
-    normalized = normalized.replace("(empty)", "")
-    normalized = normalized.replace("[empty]", "")
-    normalized = normalized.replace("empty", "") if normalized.lower() == "empty" else normalized
-    return normalized.strip()
-
-
 def generate_all(prompt: str, template_type: str):
     system = f"""
-Return ONLY this exact tagged format:
+Return ONLY this exact format:
+
 [TITLE]
-your title
+...
 [/TITLE]
+
 [AUTHOR]
-author name or blank
+...
 [/AUTHOR]
+
 [CONTENT]
-LaTeX content only
+LaTeX only
 [/CONTENT]
 
 Rules:
-- No markdown fences
-- No explanations outside the tags
+- No markdown
+- No explanations
+- Must follow tags EXACTLY
 
-LaTeX:
+LaTeX Rules:
 - No preamble
 - Do NOT escape {{}} or \\
-- Use proper structure
+- Use clean structure
 
 Template: {template_type}
 
 Structure:
 - article -> sections
 - report -> intro, methodology, results, conclusion
-- resume -> education, skills, experience, projects, certifications
 - book -> chapters
 - letter -> formal layout
+- resume -> adaptive professional resume
 
-Resume-specific rules:
-- The resume template already renders the main name/title block
-- Do not create a second centered header with name, contact info, or title inside CONTENT
-- For resume, CONTENT should start directly with sections like \\section*{{Education}}
+Resume Rules:
+- Generate a professional resume for ANY profession
+- Choose sections dynamically (Education, Experience, Projects, Skills, etc.)
+- Use bullet points ONLY
+- Use strong action verbs
+- Keep it clean and one-page
+
+LaTeX:
+- Use \\section*
+- Use \\begin{{itemize}} \\item ... \\end{{itemize}}
 """
 
     try:
@@ -80,16 +77,12 @@ Resume-specific rules:
 
         text = None
 
-        if getattr(response, "candidates", None):
-            candidate = response.candidates[0]
-            if getattr(candidate, "content", None) and getattr(candidate.content, "parts", None):
+        if response.candidates:
+            c = response.candidates[0]
+            if c.content and c.content.parts:
                 text = "".join(
-                    part.text for part in candidate.content.parts
-                    if hasattr(part, "text")
+                    p.text for p in c.content.parts if hasattr(p, "text")
                 )
-
-        if not text and hasattr(response, "text"):
-            text = response.text
 
         if not text:
             raise ValueError("Empty response")
@@ -101,20 +94,7 @@ Resume-specific rules:
         content = extract_tagged_field(text, "CONTENT")
 
         if not content:
-            try:
-                data = json.loads(text)
-            except json.JSONDecodeError:
-                match = re.search(r"\{.*\}", text, re.DOTALL)
-                data = json.loads(match.group()) if match else {}
-
-            title = title or data.get("title", "")
-            author = author or data.get("author", "")
-            content = data.get("content", "")
-
-        content = normalize_generated_content(content)
-
-        if not content:
-            raise ValueError("No content")
+            raise ValueError("No content generated")
 
         return title, author, content
 

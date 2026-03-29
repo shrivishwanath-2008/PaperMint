@@ -9,25 +9,22 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[RO,LE]{\thepage}
-\fancyhead[LO]{\nouppercase{\rightmark}} % Chapter name on left odd page
-\fancyhead[RE]{\nouppercase{\leftmark}}  % Section name on right even page
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RE]{\nouppercase{\leftmark}}
 \renewcommand{\headrulewidth}{0.4pt}
 
-% Use the new substitution variables
 \title{$title}
 \author{$author}
 \date{$date}
 
 \begin{document}
 
-\frontmatter % Roman numerals for front matter (ToC, Preface)
+\frontmatter
 \maketitle
 \tableofcontents
 
-\mainmatter % Arabic numerals for main content
+\mainmatter
 
-% START CONTENT BLOCK
-$content 
-% END CONTENT BLOCK
+$content
 
 \end{document}

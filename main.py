@@ -83,6 +83,14 @@ async def generate_ui(
     template_type: str = Form("article"),
 ):
     result = generate_all(content, template_type)
+
+
+    if not result or not result[2]:
+        return HTMLResponse(
+            content="GENERATION_FAILED",
+            status_code=200
+        )
+
     title, author, latex_content = result
 
     title = fix_title(title, content)

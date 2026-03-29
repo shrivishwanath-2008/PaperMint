@@ -5,14 +5,14 @@ from fastapi import HTTPException
 
 
 def create_pdf(content, filename, template_type, title, author):
-
-    template_file = f"{template_type}.tex"
+    template_dir = "latex_templates"
+    template_file = os.path.join(template_dir, f"{template_type}.tex")
     tex_file = f"{filename}.tex"
     pdf_file = f"{filename}.pdf"
 
     # fallback if template missing
     if not os.path.exists(template_file):
-        template_file = "article.tex"
+        template_file = os.path.join(template_dir, "article.tex")
 
     with open(template_file, "r", encoding="utf-8") as f:
         template = Template(f.read())

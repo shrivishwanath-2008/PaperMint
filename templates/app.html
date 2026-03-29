@@ -152,7 +152,7 @@
         <h1>PaperMint</h1>
         <p class="tagline">Ask the AI PDF Maker to create your document.</p>
 
-        <form method="POST" action="/generate-ui">
+        <form id="generateForm" onsubmit="return false;">
 
             <div class="main-input">
                 <textarea name="content" placeholder="Generate a resume for a Python developer, focusing on FastAPI." required></textarea>
@@ -184,13 +184,65 @@
 
                 </div>
 
-                <button type="submit">Generate PDF</button>
+                <button type="button" onclick="generatePDF()">Generate PDF</button>
 
             </div>
 
         </form>
 
     </div>
+<script>
+async function generatePDF() {
+    console.log("🔥 Button clicked");  // DEBUG
 
+    const form = document.getElementById("generateForm");
+    const formData = new FormData(form);
+
+    const res = await fetch("/generate-ui", {
+        method: "POST",
+        body: formData
+    });
+
+    console.log("🔥 Request sent");  // DEBUG
+
+    // check if backend sent failure message
+    const contentType = res.headers.get("Content-Type");
+
+    if (contentType && contentType.includes("text/html")) {
+        const text = await res.text();
+
+        if (text === "GENERATION_FAILED") {
+            showToast();
+            return;
+        }  
+    }
+
+// ✅ HANDLE PDF PROPERLY
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.pdf";
+    a.click();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.pdf";
+    a.click();
+}
+
+function showToast() {
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 5000);
+}
+</script>
 </body>
+
+
 </html>
