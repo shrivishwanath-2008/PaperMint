@@ -131,6 +131,27 @@
         accent-color: var(--accent);
     }
 
+    .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(0,0,0,0.85);
+        color: var(--text);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(12px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     </style>
 </head>
 
@@ -191,9 +212,10 @@
         </form>
 
     </div>
+    <div id="toast" class="toast">Could not generate the document. Please try again.</div>
 <script>
 async function generatePDF() {
-    console.log("🔥 Button clicked");  // DEBUG
+    console.log("Generate button clicked");
 
     const form = document.getElementById("generateForm");
     const formData = new FormData(form);
@@ -203,7 +225,7 @@ async function generatePDF() {
         body: formData
     });
 
-    console.log("🔥 Request sent");  // DEBUG
+    console.log("Request sent");
 
     // check if backend sent failure message
     const contentType = res.headers.get("Content-Type");
@@ -217,7 +239,7 @@ async function generatePDF() {
         }  
     }
 
-// ✅ HANDLE PDF PROPERLY
+    // Handle the PDF download returned by the backend.
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
 
@@ -225,12 +247,7 @@ async function generatePDF() {
     a.href = url;
     a.download = "document.pdf";
     a.click();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "document.pdf";
-    a.click();
+    window.URL.revokeObjectURL(url);
 }
 
 function showToast() {
