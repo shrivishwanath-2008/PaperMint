@@ -10,7 +10,6 @@ def create_pdf(content, filename, template_type, title, author):
     tex_file = f"{filename}.tex"
     pdf_file = f"{filename}.pdf"
 
-    # fallback if template missing
     if not os.path.exists(template_file):
         template_file = os.path.join(template_dir, "article.tex")
 

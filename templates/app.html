@@ -3,161 +3,16 @@
 <head>
     <title>PaperMint</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
-
-    <style>
-    :root {
-        --bg: #000;
-        --glass: rgba(32, 33, 36, 0.6);
-        --border: rgba(255,255,255,0.1);
-        --text: #e8eaed;
-        --sub: #eef2f6;
-        --accent: #8ab4f8;
-    }
-
-    body {
-        margin: 0;
-        font-family: 'Google Sans', Arial;
-        background: radial-gradient(circle at top, #111, #000);
-        color: var(--text);
-    }
-
-    /* NAVBAR */
-    .navbar {
-        display: flex;
-        justify-content: space-between;
-        padding: 15px 40px;
-        border-bottom: 1px solid var(--border);
-        backdrop-filter: blur(10px);
-        background: rgba(0,0,0,0.4);
-        position: sticky;
-        top: 0;
-    }
-
-    .nav-links a {
-        margin-left: 20px;
-        text-decoration: none;
-        color: var(--text);
-        transition: 0.3s;
-    }
-
-    .nav-links a:hover {
-        color: var(--accent);
-    }
-
-    /* MAIN */
-    .container {
-        max-width: 900px;
-        margin: 12vh auto;
-        text-align: center;
-    }
-
-    h1 {
-        font-size: 3em;
-        font-weight: 300;
-    }
-
-    .tagline {
-        color: var(--sub);
-        margin-bottom: 40px;
-    }
-
-    /* INPUT BOX */
-    .main-input {
-        background: var(--glass);
-        border-radius: 25px;
-        padding: 20px;
-        border: 1px solid var(--border);
-        backdrop-filter: blur(15px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    }
-
-    textarea {
-        width: 100%;
-        height: 150px;
-        background: transparent;
-        border: none;
-        color: var(--text);
-        font-size: 1.1em;
-        outline: none;
-        resize: none;
-    }
-
-    /* OPTIONS */
-    .options {
-        margin-top: 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .left-options {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-    }
-
-    select {
-        background: var(--glass);
-        color: var(--text);
-        border: 1px solid var(--border);
-        padding: 8px 12px;
-        border-radius: 8px;
-        backdrop-filter: blur(10px);
-    }
-
-    label {
-        color: var(--sub);
-        font-size: 0.9em;
-    }
-
-    /* BUTTON */
-    button {
-        background: var(--accent);
-        color: black;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    button:hover {
-        transform: scale(1.05);
-    }
-
-    /* CHECKBOX */
-    input[type="checkbox"] {
-        accent-color: var(--accent);
-    }
-
-    .toast {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        padding: 12px 16px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: rgba(0,0,0,0.85);
-        color: var(--text);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(12px);
-        transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .toast.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
+    <div id="loader-container">
+        <div id="loader-text">Loading...</div>
+        <div id="loader-bar"></div>
+    </div>
+
     <div class="navbar">
         <div><strong>PaperMint</strong></div>
         <div class="nav-links">
@@ -167,7 +22,6 @@
         </div>
     </div>
 
-    <!-- MAIN -->
     <div class="container">
 
         <h1>PaperMint</h1>
@@ -183,7 +37,6 @@
 
                 <div class="left-options">
 
-                    <!-- TEMPLATE -->
                     <div>
                         <label>Template</label><br>
                         <select name="template_type">
@@ -192,16 +45,6 @@
                             {% endfor %}
                         </select>
                     </div>
-
-                    <!-- MODEL -->
-                    <!-- <div>
-                        <label>LLM Model</label><br>
-                        <select name="model">
-                            {% for m in models %}
-                                <option value="{{ m }}">{{ m | upper }}</option>
-                            {% endfor %}
-                        </select>
-                    </div> -->
 
                 </div>
 
@@ -212,54 +55,10 @@
         </form>
 
     </div>
+
     <div id="toast" class="toast">Could not generate the document. Please try again.</div>
-<script>
-async function generatePDF() {
-    console.log("Generate button clicked");
 
-    const form = document.getElementById("generateForm");
-    const formData = new FormData(form);
+    <script src="/static/script.js"></script>
 
-    const res = await fetch("/generate-ui", {
-        method: "POST",
-        body: formData
-    });
-
-    console.log("Request sent");
-
-    // check if backend sent failure message
-    const contentType = res.headers.get("Content-Type");
-
-    if (contentType && contentType.includes("text/html")) {
-        const text = await res.text();
-
-        if (text === "GENERATION_FAILED") {
-            showToast();
-            return;
-        }  
-    }
-
-    // Handle the PDF download returned by the backend.
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "document.pdf";
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
-
-function showToast() {
-    const toast = document.getElementById("toast");
-    toast.classList.add("show");
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 5000);
-}
-</script>
 </body>
-
-
 </html>

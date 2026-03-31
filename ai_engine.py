@@ -1,107 +1,136 @@
+# from curses import flash
+from email.mime import text
 import os
 import json
+from pydoc import text
 import re
+from urllib import response
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# --- INIT ---
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-MODEL = "gemini-flash-latest"
+MODEL = "gemini-2.5-flash"
 model = genai.GenerativeModel(MODEL)
 
 
 def extract_tagged_field(text: str, tag: str) -> str:
+    if not text:
+        return ""
+
     match = re.search(rf"\[{tag}\]\s*(.*?)\s*\[/{tag}\]", text, re.DOTALL)
-    return match.group(1).strip() if match else ""
+    if match:
+        value = match.group(1)
+        return str(value).strip() if value else ""
+
+    if tag == "CONTENT":
+        match = re.search(rf"\[{tag}\]\s*(.*)", text, re.DOTALL)
+        if match:
+            value = match.group(1)
+            return str(value).strip() if value else ""
+
+    return ""
+
+
+def normalize_generated_content(content: str) -> str:
+    if not content:
+        return ""
+
+    normalized = str(content).strip()
+    normalized = normalized.replace("**", "")
+    normalized = normalized.replace("(empty)", "")
+    normalized = normalized.replace("[empty]", "")
+
+    if normalized.lower() == "empty":
+        return ""
+
+    return str(normalized).strip()
 
 
 def generate_all(prompt: str, template_type: str):
-    system = f"""
-Return ONLY this exact format:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return None, None, None, "GEMINI_API_KEY is missing."
+
+    system = f'''
+Return ONLY this format:
 
 [TITLE]
-...
 [/TITLE]
 
 [AUTHOR]
-...
 [/AUTHOR]
 
 [CONTENT]
-LaTeX only
 [/CONTENT]
 
-Rules:
-- No markdown
-- No explanations
-- Must follow tags EXACTLY
-
-LaTeX Rules:
-- No preamble
-- Do NOT escape {{}} or \\
-- Use clean structure
+RULES:
+- Must include ALL tags and close them
+- Output must end with [/CONTENT]
+- No markdown, no explanations
+- LaTeX only inside CONTENT
 
 Template: {template_type}
 
-Structure:
-- article -> sections
-- report -> intro, methodology, results, conclusion
-- book -> chapters
-- letter -> formal layout
-- resume -> adaptive professional resume
-
-Resume Rules:
-- Generate a professional resume for ANY profession
-- Choose sections dynamically (Education, Experience, Projects, Skills, etc.)
-- Use bullet points ONLY
-- Use strong action verbs
-- Keep it clean and one-page
-
-LaTeX:
+Resume:
+- No title
+- Sections: Education, Experience, Projects, Skills
 - Use \\section*
 - Use \\begin{{itemize}} \\item ... \\end{{itemize}}
-"""
+'''
 
-    try:
-        prompt = prompt[:800]
+    text = None
 
-        response = model.generate_content(
-            f"{system}\n{prompt}",
-            generation_config={
-                "temperature": 0.6,
-                "max_output_tokens": 1500,
-            },
-        )
+    # ✅ retry system
+    for attempt in range(2):
+        try:
+            response = model.generate_content(
+                f"{system}\n{prompt}",
+                generation_config={
+                    "temperature": 0.6,
+                    "max_output_tokens": 2000,
+                },
+            )
 
-        text = None
+            # extract safely
+            if hasattr(response, "text") and response.text:
+                text = response.text
 
-        if response.candidates:
-            c = response.candidates[0]
-            if c.content and c.content.parts:
-                text = "".join(
-                    p.text for p in c.content.parts if hasattr(p, "text")
-                )
+            if not text:
+                raise ValueError("Empty AI response")
 
-        if not text:
-            raise ValueError("Empty response")
+            text = str(text)
 
-        print("RAW:", text)
+            # reject bad outputs
+            if len(text) < 100:
+                raise ValueError("Too short")
 
-        title = extract_tagged_field(text, "TITLE")
-        author = extract_tagged_field(text, "AUTHOR")
-        content = extract_tagged_field(text, "CONTENT")
+            if not text.strip().endswith("[/CONTENT]"):
+                print("FIXING: adding closing tag")
+                text += "\n[/CONTENT]"
+            break  # success
 
-        if not content:
-            raise ValueError("No content generated")
+        except Exception as e:
+            print(f"Attempt {attempt+1} failed:", e)
+            text = None
 
-        return title, author, content
+    if not text:
+        return None, None, None, "AI failed. Try again."
 
-    except Exception as e:
-        print("GEMINI ERROR:", e)
+    # extract fields
+    title = extract_tagged_field(text, "TITLE")
+    author = extract_tagged_field(text, "AUTHOR")
+    content = extract_tagged_field(text, "CONTENT")
 
-        if "429" in str(e):
-            return "RATE_LIMIT", None, None
+    if not content:
+        print("FALLBACK: using raw text")
+        content = text
 
-        return None, None, None
+    content = normalize_generated_content(content)
+
+    if not content:
+        print("FALLBACK: using raw text")
+        content = text
+
+    return title, author, content, None
