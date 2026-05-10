@@ -1,22 +1,30 @@
-\documentclass[11pt]{article}
+\documentclass[10pt,a4paper]{article}
 
-\usepackage[margin=0.7in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[
+    top=0.6in,
+    bottom=0.6in,
+    left=0.7in,
+    right=0.7in
+]{geometry}
+
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
 
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
+\pagestyle{empty}
 
-\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+% compact sections
+\titlespacing{\section}{0pt}{6pt}{4pt}
+
+% compact lists
+\setlist[itemize]{
+    noitemsep,
+    topsep=2pt,
+    leftmargin=1.2em
+}
 
 \begin{document}
-
-\begin{center}
-    {\Huge \textbf{$title}} \\[6pt]
-    \small email@example.com \;|\; +1-555-0101 \;|\; linkedin.com/in/profile
-\end{center}
-
-\vspace{6pt}
 
 $content
 

@@ -6,15 +6,19 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
-
+<body class="app-page">
+    <div class="cursor-glow"></div>
+    <div id="cursor-glow"></div>
+    <div id="dots"></div>
     <div id="loader-container">
         <div id="loader-text">Loading...</div>
         <div id="loader-bar"></div>
     </div>
 
     <div class="navbar">
-        <div><strong>PaperMint</strong></div>
+        <div class="brand">
+            <img src="/static/papermint-logo.png" class="brand-logo">
+        </div>
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="/about">About</a>
@@ -24,26 +28,35 @@
 
     <div class="container">
 
-        <h1>PaperMint</h1>
+        <div class="hero-logo-wrapper">
+            <img src="/static/papermint-logo.png" class="hero-logo">
+        </div>
         <p class="tagline">Ask the AI PDF Maker to create your document.</p>
 
         <form id="generateForm" onsubmit="return false;">
 
             <div class="main-input">
-                <textarea name="content" placeholder="Generate a resume for a Python developer, focusing on FastAPI." required></textarea>
+                <textarea
+                    id="prompt"
+                    name="prompt"
+                    placeholder="Write an article about artificial intelligence."
+                    required
+                ></textarea>
             </div>
 
             <div class="options">
 
                 <div class="left-options">
 
-                    <div>
-                        <label>Template</label><br>
-                        <select name="template_type">
-                            {% for t in templates %}
-                                <option value="{{ t }}">{{ t | capitalize }}</option>
-                            {% endfor %}
+                    <div class="template-group">
+
+                        <label for="template">Template: </label>
+
+                        <select id="template">
+                            <option value="article">Article</option>
+                            <option value="resume">Resume</option>
                         </select>
+
                     </div>
 
                 </div>

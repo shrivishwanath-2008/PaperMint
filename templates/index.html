@@ -6,19 +6,24 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
-
+<body class="home-page">
+    <div class="cursor-glow"></div>
+    <div id="dots"></div>
     <div class="navbar">
-        <div><strong>PaperMint</strong></div>
+        <div class="brand">
+            <img src="/static/papermint-logo.png" class="brand-logo">
+        </div>
         <div class="nav-links">
             <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/app">Get Started</a>
+            <a href="about">About</a>
+            <a href="app">Get Started</a>
         </div>
     </div>
 
     <div class="hero">
-        <h1>PaperMint</h1>
+        <div class="hero-logo-wrapper">
+            <img src="/static/papermint-logo.png" class="hero-logo">
+        </div>
         <p class="tagline">AI-powered PDF generation in seconds</p>
 
         <a href="/app" class="btn">Get Started</a>

@@ -1,151 +1,317 @@
 import os
 import re
-from unittest import result
+import uuid
 
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import (
+    HTMLResponse,
+    FileResponse,
+    JSONResponse
+)
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from generator import create_pdf
 from ai_engine import generate_all
 
 
 app = FastAPI()
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 
+# ---------------- ROUTES ---------------- #
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request}
+    )
 
 
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
-    return templates.TemplateResponse("about.html", {"request": request})
+
+    return templates.TemplateResponse(
+        "about.html",
+        {"request": request}
+    )
 
 
 @app.get("/app", response_class=HTMLResponse)
 async def app_page(request: Request):
+
     return templates.TemplateResponse(
         "app.html",
         {
             "request": request,
-            "templates": ["article", "resume"],
+            "templates": ["article", "resume"]
         }
     )
 
 
+# ---------------- HELPERS ---------------- #
+
 def clean_filename(text: str):
+
     if not text:
         return "document"
 
     text = str(text).strip().lower()
-    text = re.sub(r'[^a-z0-9 ]', '', text)
-    return "_".join(text.split())[:40] or "document"
+
+    text = re.sub(r"[^a-z0-9 ]", "", text)
+
+    cleaned = "_".join(text.split())
+
+    return cleaned[:40] or "document"
 
 
-def fix_title(title: str, content: str):
+def fix_title(title: str, prompt: str):
+
     if not title:
-        title = ""
+        return "document"
 
-    if not title or title.lower() in ["empty", "document"]:
-        if "resume" in content.lower():
-            return "Resume"
-        elif "report" in content.lower():
-            return "Report"
-        return content[:40]
+    title = str(title).strip()
+
+    if title.lower() in ["empty", "document", "title"]:
+
+        if "resume" in prompt.lower():
+            return "resume"
+
+        return "document"
 
     return title[:80]
 
 
+def extract_body(content: str):
+
+    match = re.search(
+        r"\\begin\{document\}(.*?)\\end\{document\}",
+        content,
+        re.DOTALL
+    )
+
+    if match:
+        return match.group(1)
+
+    return content
+
+
+def remove_forbidden_commands(content: str):
+
+    patterns = [
+
+        r"\\documentclass.*?\}",
+        r"\\usepackage.*?\}",
+        r"\\geometry.*?\}",
+        r"\\begin\{document\}",
+        r"\\end\{document\}",
+        r"\\maketitle",
+        r"\\title\{.*?\}",
+        r"\\author\{.*?\}",
+        r"\\date\{.*?\}",
+    ]
+
+    for pattern in patterns:
+
+        content = re.sub(
+            pattern,
+            "",
+            content,
+            flags=re.DOTALL
+        )
+
+    return content
+
+
+def fix_common_latex(content: str):
+
+    content = re.sub(
+        r"(?m)^item ",
+        r"\\item ",
+        content
+    )
+
+    lines = []
+
+    for line in content.splitlines():
+
+        if "\\section*" in line and not line.strip().endswith("}"):
+            line += "}"
+
+        lines.append(line)
+
+    content = "\n".join(lines)
+
+    open_braces = content.count("{")
+    close_braces = content.count("}")
+
+    if open_braces > close_braces:
+        content += "}" * (open_braces - close_braces)
+
+    return content
+
+
+def auto_close_environments(content: str):
+
+    environments = [
+        "itemize",
+        "enumerate",
+        "align",
+        "equation"
+    ]
+
+    for env in environments:
+
+        begins = len(
+            re.findall(
+                rf"\\begin\{{{env}\}}",
+                content
+            )
+        )
+
+        ends = len(
+            re.findall(
+                rf"\\end\{{{env}\}}",
+                content
+            )
+        )
+
+        while ends < begins:
+
+            content += f"\n\\end{{{env}}}"
+
+            ends += 1
+
+    return content
+
+
 def clean_latex(content: str):
+
     if not content:
         return ""
 
     content = str(content)
 
-    # remove logs / garbage
-    content = content.split("This is pdfTeX")[0]
-    content = content.split("FALLBACK:")[0]
+    garbage_markers = [
+        "This is pdfTeX",
+        "LaTeX Error",
+        "Emergency stop",
+        "Transcript written on"
+    ]
 
-    # remove full document if present
-    if "\\documentclass" in content:
-        match = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", content, re.DOTALL)
-        if match:
-            content = match.group(1)
+    for marker in garbage_markers:
 
-    content = re.sub(r"\\documentclass.*", "", content)
-    content = re.sub(r"\\usepackage.*", "", content)
-    content = re.sub(r"\\begin\{document\}", "", content)
-    content = re.sub(r"\\end\{document\}", "", content)
+        if marker in content:
+            content = content.split(marker)[0]
 
-    # fix item
-    content = re.sub(r"(?m)^item ", r"\\item ", content)
+    content = extract_body(content)
 
-    # fix itemize
-    if "\\item" in content and "\\begin{itemize}" not in content:
-        content = "\\begin{itemize}\n" + content
+    content = remove_forbidden_commands(content)
 
-    if "\\begin{itemize}" in content and "\\end{itemize}" not in content:
-        content += "\n\\end{itemize}"
+    content = fix_common_latex(content)
 
-    # fix sections
-    lines = []
-    for line in content.split("\n"):
-        if "\\section*" in line and not line.strip().endswith("}"):
-            line += "}"
-        lines.append(line)
-    content = "\n".join(lines)
+    content = re.sub(
+        r"\\\[[^\]]*$",
+        "",
+        content,
+        flags=re.DOTALL
+    )
 
-    # balance braces
-    if content.count("{") > content.count("}"):
-        content += "}" * (content.count("{") - content.count("}"))
+    content = re.sub(
+        r"\\[a-zA-Z]*$",
+        "",
+        content
+    )
+
+    while content.count("{") > content.count("}"):
+        content = content[:-1]
+
+    content = auto_close_environments(content)
+
+    content = re.sub(r"\n{3,}", "\n\n", content)
 
     return content.strip()
+
+
+# ---------------- PDF GENERATION ---------------- #
 
 @app.post("/generate-ui")
 async def generate_ui(
     content: str = Form(...),
     template_type: str = Form("article"),
 ):
-    title, author, latex_content, error = generate_all(content, template_type)
 
-    if error or not latex_content or len(latex_content.strip()) < 20:
+    title, author, latex_content, error = generate_all(
+        content,
+        template_type
+    )
+
+    if error:
+
         return JSONResponse(
             {
                 "ok": False,
-                "error": error or "Document generation failed."
+                "error": error
+            },
+            status_code=200
+        )
+
+    if not latex_content:
+
+        return JSONResponse(
+            {
+                "ok": False,
+                "error": "Empty AI content."
             },
             status_code=200
         )
 
     if template_type == "resume":
-        title = ""
+        latex_content = latex_content.strip()
+    else:
+        latex_content = clean_latex(latex_content)
+
+    print("\n========== FINAL LATEX ==========\n")
+    print(latex_content)
+    print("\n=================================\n")
+
+    if len(latex_content.strip()) < 10:
+
+        return JSONResponse(
+            {
+                "ok": False,
+                "error": "Generated LaTeX became empty."
+            },
+            status_code=200
+        )
+
+    if template_type == "resume":
+        title = "resume"
     else:
         title = fix_title(title, content)
-    latex_content = clean_latex(latex_content)
 
-    if not latex_content or len(latex_content.strip()) < 20:
-        print("FALLBACK: empty content")
-        
-        
-
-    temp_filename = f"temp_{os.getpid()}"
+    temp_filename = f"temp_{uuid.uuid4().hex}"
 
     pdf_path = create_pdf(
         content=latex_content,
         filename=temp_filename,
         template_type=template_type,
         title=title,
-        author=""
+        author=author or ""
     )
 
     final_filename = f"{clean_filename(title)}.pdf"
 
+    print("PDF PATH:", pdf_path)
+    print("PDF SIZE:", os.path.getsize(pdf_path))
+
     return FileResponse(
-        pdf_path,
+        path=pdf_path,
         media_type="application/pdf",
         filename=final_filename
     )
