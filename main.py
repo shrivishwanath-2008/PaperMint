@@ -47,10 +47,7 @@ async def app_page(request: Request):
 
     return templates.TemplateResponse(
         "app.html",
-        {
-            "request": request,
-            "templates": ["article", "resume"]
-        }
+        {"request": request}
     )
 
 
