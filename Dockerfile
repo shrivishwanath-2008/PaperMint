@@ -1,6 +1,10 @@
 FROM python:3.11
-
-RUN apt-get update && apt-get install -y texlive-full
+RUN apt-get update && apt-get install -y \
+    texlive-latex-base \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-science \
+    latexmk
 
 WORKDIR /app
 
