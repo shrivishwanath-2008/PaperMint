@@ -1,0 +1,69 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\title{NCERT Class 12 Mathematics: Relations and Functions Formula Sheet}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. Types of Relations}
+
+A relation $R$ in a set $A$ is a subset of $A \times A$.
+
+\begin{itemize}
+    \item \textbf{Empty Relation:} $R = \emptyset \subset A \times A$.
+    \item \textbf{Universal Relation:} $R = A \times A$.
+    \item \textbf{Reflexive Relation:} $(a, a) \in R$ for every $a \in A$.
+    \item \textbf{Symmetric Relation:} $(a_1, a_2) \in R \implies (a_2, a_1) \in R$ for all $a_1, a_2 \in A$.
+    \item \textbf{Transitive Relation:} $(a_1, a_2) \in R$ and $(a_2, a_3) \in R \implies (a_1, a_3) \in R$ for all $a_1, a_2, a_3 \in A$.
+    \item \textbf{Equivalence Relation:} A relation $R$ in a set $A$ is an equivalence relation if $R$ is reflexive, symmetric, and transitive.
+\end{itemize}
+
+\section*{2. Types of Functions}
+
+Let $f: X \to Y$ be a function.
+
+\begin{itemize}
+    \item \textbf{Injective (One-to-One):} $f$ is one-one if $f(x_1) = f(x_2) \implies x_1 = x_2$ for all $x_1, x_2 \in X$.
+    \item \textbf{Surjective (Onto):} $f$ is onto if for every $y \in Y$, there exists $x \in X$ such that $f(x) = y$. (Range = Codomain).
+    \item \textbf{Bijective:} $f$ is bijective if it is both injective and surjective.
+\end{itemize}
+
+\section*{3. Composition of Functions}
+
+Let $f: A \to B$ and $g: B \to C$ be two functions. The composition $g \circ f: A \to C$ is defined as:
+\[ (g \circ f)(x) = g(f(x)), \forall x \in A \]
+
+\section*{4. Invertible Functions}
+
+A function $f: X \to Y$ is invertible if there exists a function $g: Y \to X$ such that:
+\[ g \circ f = I_X \quad \text{and} \quad f \circ g = I_Y \]
+where $I_X$ and $I_Y$ are identity functions on sets $X$ and $Y$ respectively.
+
+\begin{itemize}
+    \item A function $f$ is invertible if and only if $f$ is bijective.
+    \item If $f$ is invertible, then $f^{-1}$ is unique.
+    \item $(g \circ f)^{-1} = f^{-1} \circ g^{-1}$.
+\end{itemize}
+
+\section*{5. Number of Relations and Functions}
+
+If $n(A) = p$ and $n(B) = q$:
+\begin{itemize}
+    \item Total number of relations from $A$ to $B = 2^{pq}$.
+    \item Total number of functions from $A$ to $B = q^p$.
+    \item Number of one-one functions (if $q \geq p$) $= \frac{q!}{(q-p)!} = P(q, p)$.
+    \item Number of onto functions (if $q \leq p$) $= \sum_{r=1}^{q} (-1)^{q-r} \binom{q}{r} r^p$.
+    \item Number of bijections (if $p = q$) $= p!$.
+\end{itemize}
+
+\end{document}

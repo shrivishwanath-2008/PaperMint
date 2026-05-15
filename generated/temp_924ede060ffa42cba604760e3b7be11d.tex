@@ -1,0 +1,85 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\title{Class 12 Chemistry NCERT Solutions}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Chapter 1: Solutions}
+
+\subsection*{Problem 1.1}
+Calculate the mass percentage of benzene ($C_6H_6$) and carbon tetrachloride ($CCl_4$) if 22 g of benzene is dissolved in 122 g of carbon tetrachloride.
+
+\textbf{Solution:}
+Mass of solution = Mass of $C_6H_6$ + Mass of $CCl_4$
+Mass of solution = $22\text{ g} + 122\text{ g} = 144\text{ g}$
+
+Mass percentage of $C_6H_6 = \frac{\text{Mass of } C_6H_6}{\text{Total mass of solution}} \times 100$
+Mass percentage of $C_6H_6 = \frac{22}{144} \times 100 = 15.28\%$
+
+Mass percentage of $CCl_4 = \frac{\text{Mass of } CCl_4}{\text{Total mass of solution}} \times 100$
+Mass percentage of $CCl_4 = \frac{122}{144} \times 100 = 84.72\%$
+
+\subsection*{Problem 1.2}
+State Raoult's Law.
+\textbf{Answer:} Raoult's law states that for a solution of volatile liquids, the partial vapour pressure of each component of the solution is directly proportional to its mole fraction present in solution. For a binary solution of components A and B:
+\[ P_A = P_A^0 \chi_A \]
+\[ P_B = P_B^0 \chi_B \]
+
+\section*{Chapter 2: Electrochemistry}
+
+\subsection*{Problem 2.1}
+Represent the cell in which the following reaction takes place:
+$Mg(s) + 2Ag^+(0.0001 M) \rightarrow Mg^{2+}(0.130 M) + 2Ag(s)$
+Calculate its $E_{cell}$ if $E^0_{cell} = 3.17$ V.
+
+\textbf{Solution:}
+The cell representation is: $Mg(s) | Mg^{2+}(0.130 M) || Ag^+(0.0001 M) | Ag(s)$
+Using Nernst Equation:
+\[ E_{cell} = E^0_{cell} - \frac{0.0591}{n} \log \frac{[Mg^{2+}]}{[Ag^+]^2} \]
+Here $n = 2$.
+\[ E_{cell} = 3.17 - \frac{0.0591}{2} \log \frac{0.130}{(0.0001)^2} \]
+\[ E_{cell} = 3.17 - 0.02955 \log(1.3 \times 10^7) \]
+\[ E_{cell} = 3.17 - 0.02955(7.1139) \]
+\[ E_{cell} = 3.17 - 0.21 = 2.96 \text{ V} \]
+
+\section*{Chapter 3: Chemical Kinetics}
+
+\subsection*{Problem 3.1}
+The rate constant for a first order reaction is $60 \text{ s}^{-1}$. How much time will it take to reduce the initial concentration of the reactant to its $1/16^{th}$ value?
+
+\textbf{Solution:}
+For a first order reaction:
+\[ t = \frac{2.303}{k} \log \frac{[R]_0}{[R]} \]
+Given $k = 60 \text{ s}^{-1}$ and $[R] = \frac{[R]_0}{16}$.
+\[ t = \frac{2.303}{60} \log \frac{[R]_0}{[R]_0/16} \]
+\[ t = \frac{2.303}{60} \log 16 \]
+\[ t = \frac{2.303}{60} \log 2^4 = \frac{2.303 \times 4 \times 0.3010}{60} \]
+\[ t = \frac{2.773}{60} = 0.0462 \text{ s} = 4.62 \times 10^{-2} \text{ s} \]
+
+\section*{Chapter 4: d- and f- Block Elements}
+
+\subsection*{Problem 4.1}
+Why do transition elements exhibit variable oxidation states?
+\textbf{Answer:} Transition elements exhibit variable oxidation states because the energy difference between $(n-1)d$ and $ns$ orbitals is very small. As a result, electrons from both energy levels can participate in bond formation.
+
+\subsection*{Problem 4.2}
+Calculate the 'spin-only' magnetic moment of $M^{2+}(aq)$ ion ($Z = 27$).
+\textbf{Answer:} $Z = 27$ is Cobalt (Co). Electronic configuration of $Co = [Ar] 3d^7 4s^2$.
+Electronic configuration of $Co^{2+} = [Ar] 3d^7$.
+Number of unpaired electrons ($n$) in $3d^7$ ($t_{2g}^5 e_g^2$):
+$d^7$ has 3 unpaired electrons.
+Magnetic moment $\mu = \sqrt{n(n+2)}$ BM
+$\mu = \sqrt{3(3+2)} = \sqrt{15} = 3.87$ BM.
+
+\end{document}

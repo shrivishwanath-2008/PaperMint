@@ -1,0 +1,54 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\title{The Special Theory of Relativity and the Lorentz Transformation}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Special Theory of Relativity is a physical theory regarding the relationship between space and time. It is based on two fundamental postulates:
+\begin{enumerate}
+    \item The laws of physics are invariant in all inertial frames of reference.
+    \item The speed of light in a vacuum, $c$, is the same for all observers, regardless of the motion of the light source or observer.
+\end{enumerate}
+
+\section{The Spacetime Interval}
+A primary consequence of these postulates is that the distance between two events in spacetime, known as the spacetime interval $ds^2$, must be invariant under a change of inertial frames. In flat Minkowski space, this interval is defined as:
+\begin{equation}
+    ds^2 = -c^2 dt^2 + dx^2 + dy^2 + dz^2
+\end{equation}
+For any two observers in different inertial frames, the condition $ds^2 = ds'^2$ must hold.
+
+\section{The Lorentz Transformation: A Solution}
+The equations that satisfy the invariance of the spacetime interval are the Lorentz transformations. For a reference frame $S'$ moving with a constant velocity $v$ along the $x$-axis relative to a frame $S$, the coordinates $(t, x, y, z)$ and $(t', x', y', z')$ are related by:
+\begin{align}
+    t' &= \gamma \left( t - \frac{vx}{c^2} \right) \\
+    x' &= \gamma (x - vt) \\
+    y' &= y \\
+    z' &= z
+\end{align}
+where the Lorentz factor $\gamma$ is defined as:
+\begin{equation}
+    \gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}
+\end{equation}
+These transformations represent the mathematical solution to the requirement that the speed of light remains constant across all inertial frames.
+
+\section{Relativistic Effects}
+The Lorentz transformations lead to several significant physical predictions:
+\begin{itemize}
+    \item \textbf{Time Dilation:} A clock moving relative to an observer will be measured to tick slower than a clock at rest in the observer's own frame, expressed as $\Delta t = \gamma \Delta t_0$.
+    \item \textbf{Length Contraction:} The length of an object in motion is measured to be shorter than its proper length in the direction of motion, expressed as $L = \frac{L_0}{\gamma}$.
+    \item \textbf{Mass-Energy Equivalence:} The theory unifies mass and energy through the relation $E^2 = (pc)^2 + (m_0 c^2)^2$, which simplifies to $E = mc^2$ for an object at rest.
+\end{itemize}
+
+\end{document}
