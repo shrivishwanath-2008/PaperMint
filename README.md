@@ -220,6 +220,21 @@ PaperMint combines:
 
 to automate the creation of professional documents from simple prompts.
 
+# Screenshots
+## Landing Page
+<p align="center">
+  <img src="static/previews/home.png" width="30%">
+  <img src="static/previews/app.png" width="30%">
+  <img src="static/previews/about.png" width="30%">
+</p>
+
+## Generated PDFs
+<p align="center">
+  <img src="static/previews/resume.png" width="30%">
+  <img src="static/previews/article.png" width="30%">
+  <img src="static/previews/formula-sheet.png" width="30%">
+</p>
+
 # License
 MIT License
 
