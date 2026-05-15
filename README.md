@@ -239,4 +239,4 @@ to automate the creation of professional documents from simple prompts.
 MIT License
 
 # Author
-Build by Shri Vishwanath
+Built by Shri Vishwanath
